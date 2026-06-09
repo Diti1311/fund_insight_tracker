@@ -6,11 +6,14 @@ Frontend: https://fund-insight-tracker.vercel.app/
 
 Backend API: https://fitbackend-2w46.onrender.com
 
+Credentials for login:
+    Email: user@gmail.com
+    Password: 123456
 ---
 
 ## Overview
 
-A full-stack MERN application that allows users to:
+A full-stack application that allows users to:
 
 * Search Indian Mutual Funds
 * View fund details and NAV history
@@ -76,8 +79,7 @@ The application uses the MFAPI service as a data source while routing all fund-d
 
 * Node.js
 * Express.js
-* MongoDB
-* Mongoose
+* Supabase
 * JWT Authentication
 * Node Cache
 
@@ -85,7 +87,7 @@ The application uses the MFAPI service as a data source while routing all fund-d
 
 * Frontend: Vercel
 * Backend: Render
-* Database: MongoDB Atlas
+* Database: Supabase
 
 ---
 
@@ -117,7 +119,8 @@ frontend/
 
 PORT=5000
 
-MONGO_URI=YOUR_MONGODB_ATLAS_URI
+SUPABASE_URL=YOUR_SUPABASE_URL
+SUPABASE_KEY=YOUR_SUPABASE_ANON_KEY
 
 JWT_SECRET=YOUR_SECRET_KEY
 

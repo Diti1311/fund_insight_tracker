@@ -16,12 +16,21 @@ import { Input } from "../components/Input";
 import { TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:5000";
+
 export function Register() {
   const navigate = useNavigate();
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [name, setName] =
+    useState("");
+
+  const [email, setEmail] =
+    useState("");
+
+  const [password, setPassword] =
+    useState("");
 
   const [isSubmitting, setIsSubmitting] =
     useState(false);
@@ -32,30 +41,33 @@ export function Register() {
     e.preventDefault();
 
     if (!name || !email || !password) {
-      toast.error("All fields are required");
+      toast.error(
+        "All fields are required"
+      );
       return;
     }
 
     try {
       setIsSubmitting(true);
 
-      const response = await fetch(
-        "http://localhost:5000/api/auth/register",
-        {
-          method: "POST",
+      const response =
+        await fetch(
+          `${API_URL}/api/auth/register`,
+          {
+            method: "POST",
 
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
 
-          body: JSON.stringify({
-            name,
-            email,
-            password
-          })
-        }
-      );
+            body: JSON.stringify({
+              name,
+              email,
+              password
+            })
+          }
+        );
 
       const data =
         await response.json();
@@ -104,7 +116,6 @@ export function Register() {
 
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
-
             <Input
               placeholder="Full Name"
               value={name}
@@ -136,7 +147,6 @@ export function Register() {
                 )
               }
             />
-
           </CardContent>
 
           <CardFooter className="flex flex-col gap-3">

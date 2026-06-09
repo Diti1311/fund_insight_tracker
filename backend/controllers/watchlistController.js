@@ -1,67 +1,120 @@
-const Watchlist = require("../models/Watchlist");
+const supabase =
+  require("../config/supabase");
 
-exports.getWatchlist = async (
-  req,
-  res
-) => {
-  const data =
-    await Watchlist.find({
-      userId: req.user.id
-    });
+exports.getWatchlist =
+  async (req, res) => {
+    try {
+      const { data, error } =
+        await supabase
+          .from("watchlist")
+          .select("*")
+          .eq(
+            "user_id",
+            req.user.id
+          );
 
-  res.json(data);
-};
+      if (error) throw error;
 
-exports.addWatchlist = async (
-  req,
-  res
-) => {
-  try {
-    const {
-      schemeCode,
-      schemeName
-    } = req.body;
-
-    const item =
-      await Watchlist.create({
-        schemeCode,
-        schemeName,
-        userId: req.user.id
-      });
-
-    res.status(201).json(item);
-
-  } catch (err) {
-    if (err.code === 11000) {
-      return res.status(409).json({
-        message:
-          "Fund already exists"
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json({
+        message: error.message,
       });
     }
+  };
 
-    res.status(500).json({
-      message: err.message
-    });
-  }
-};
+exports.addWatchlist =
+  async (req, res) => {
+    try {
+      const {
+        schemeCode,
+        schemeName,
+      } = req.body;
+
+      if (
+        !schemeCode ||
+        !schemeName
+      ) {
+        return res
+          .status(400)
+          .json({
+            message:
+              "schemeCode and schemeName required",
+          });
+      }
+
+      const { data, error } =
+        await supabase
+          .from("watchlist")
+          .insert([
+            {
+              scheme_code:
+                schemeCode,
+              scheme_name:
+                schemeName,
+              user_id:
+                req.user.id,
+            },
+          ])
+          .select();
+
+      if (error) {
+        if (
+          error.message.includes(
+            "duplicate"
+          ) ||
+          error.code ===
+            "23505"
+        ) {
+          return res
+            .status(409)
+            .json({
+              message:
+                "Fund already exists",
+            });
+        }
+
+        throw error;
+      }
+
+      res.status(201).json(
+        data
+      );
+    } catch (error) {
+      res.status(500).json({
+        message: error.message,
+      });
+    }
+  };
 
 exports.deleteWatchlist =
   async (req, res) => {
+    try {
+      const schemeCode =
+        req.params.schemeCode;
 
-    const deleted =
-      await Watchlist.findOneAndDelete({
-        schemeCode:
-          req.params.schemeCode,
-        userId: req.user.id
+      const { error } =
+        await supabase
+          .from("watchlist")
+          .delete()
+          .eq(
+            "scheme_code",
+            schemeCode
+          )
+          .eq(
+            "user_id",
+            req.user.id
+          );
+
+      if (error)
+        throw error;
+
+      res.status(200).json({
+        message: "Deleted",
       });
-
-    if (!deleted) {
-      return res.status(404).json({
-        message: "Not found"
+    } catch (error) {
+      res.status(500).json({
+        message: error.message,
       });
     }
-
-    res.json({
-      message: "Deleted"
-    });
   };

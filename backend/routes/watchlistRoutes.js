@@ -1,4 +1,5 @@
-const express = require("express");
+const express =
+  require("express");
 
 const router =
   express.Router();
@@ -9,7 +10,7 @@ const auth =
 const {
   getWatchlist,
   addWatchlist,
-  deleteWatchlist
+  deleteWatchlist,
 } = require(
   "../controllers/watchlistController"
 );

@@ -1,88 +1,94 @@
-const User = require("../models/User");
-
+const supabase = require("../config/supabase");
 const bcrypt = require("bcryptjs");
-
 const jwt = require("jsonwebtoken");
 
 exports.register = async (req, res) => {
   try {
-    const { name, email, password } =
-      req.body;
+    const { name, email, password } = req.body;
 
-    const existing = await User.findOne({
-      email
-    });
+    const { data: existing } = await supabase
+      .from("users")
+      .select("*")
+      .eq("email", email)
+      .single();
 
     if (existing) {
       return res.status(409).json({
-        message: "User already exists"
+        message: "User already exists",
       });
     }
 
-    const hashed = await bcrypt.hash(
+    const hashedPassword = await bcrypt.hash(
       password,
       10
     );
 
-    const user = await User.create({
-      name,
-      email,
-      password: hashed
-    });
+    const { data, error } = await supabase
+      .from("users")
+      .insert([
+        {
+          name,
+          email,
+          password: hashedPassword,
+        },
+      ])
+      .select()
+      .single();
 
-    res.status(201).json(user);
+    if (error) {
+      return res.status(500).json(error);
+    }
 
-  } catch (err) {
+    res.status(201).json(data);
+  } catch (error) {
     res.status(500).json({
-      message: err.message
+      message: error.message,
     });
   }
 };
 
 exports.login = async (req, res) => {
   try {
-    const { email, password } =
-      req.body;
+    const { email, password } = req.body;
 
-    const user = await User.findOne({
-      email
-    });
+    const { data: user } = await supabase
+      .from("users")
+      .select("*")
+      .eq("email", email)
+      .single();
 
     if (!user) {
       return res.status(400).json({
-        message: "Invalid credentials"
+        message: "Invalid credentials",
       });
     }
 
-    const valid =
+    const validPassword =
       await bcrypt.compare(
         password,
         user.password
       );
 
-    if (!valid) {
+    if (!validPassword) {
       return res.status(400).json({
-        message: "Invalid credentials"
+        message: "Invalid credentials",
       });
     }
 
     const token = jwt.sign(
       {
-        id: user._id
+        id: user.id,
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: "7d"
+        expiresIn: "7d",
       }
     );
 
-    res.json({
-      token
-    });
-
-  } catch (err) {
+    res.json({ token });
+  } catch (error) {
     res.status(500).json({
-      message: err.message
+      message: error.message,
     });
   }
 };

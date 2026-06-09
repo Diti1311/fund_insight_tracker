@@ -1,23 +1,34 @@
 require("dotenv").config();
 
-const express = require("express");
-const cors = require("cors");
+const express =
+  require("express");
 
-const connectDB =
-  require("./config/db");
+const cors =
+  require("cors");
 
-connectDB();
+const app =
+  express();
 
-const app = express();
+app.use(cors({
+    origin: [
+      "http://localhost:5173",
+      "https://fund-insight-tracker.vercel.app"
+    ],
+    credentials: true
+  }));
 
 app.use(
-  cors({
-    origin: ["http://localhost:5173","https://fund-insight-tracker.vercel.app/"],
-    credentials: true
-  })
+  express.json()
 );
 
-app.use(express.json());
+app.get(
+  "/",
+  (req, res) => {
+    res.send(
+      "Supabase Backend Running"
+    );
+  }
+);
 
 app.use(
   "/api/auth",
@@ -33,16 +44,17 @@ app.use(
   "/api/funds",
   require("./routes/fundRoutes")
 );
-
-app.get("/", (req, res) => {
-  res.send("API Running");
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+  });
 });
-
 const PORT =
-  process.env.PORT || 5000;
+  process.env.PORT ||
+  5000;
 
 app.listen(PORT, () =>
   console.log(
-    `Server running on ${PORT}`
+    `Server running on port ${PORT}`
   )
 );

@@ -1,4 +1,4 @@
-# Aureva Fund Insight Tracker
+# Fund Insight Tracker
 
 ## Live Demo
 

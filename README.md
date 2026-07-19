@@ -43,7 +43,7 @@ The application uses the MFAPI service as a data source while routing all fund-d
 
 ### Watchlist
 
-* Persistent MongoDB storage
+* Persistent storage
 * Duplicate prevention
 * Remove funds from watchlist
 
